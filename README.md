@@ -8,6 +8,10 @@ var Context = require('reference-count');
 
 var context = new Context();
 
+context.on('resource', function(resource) {
+  // called anytime there is a new resource counted
+});
+
 context.on('garbage', function(resource) {
   // clean up the resource here
 });
