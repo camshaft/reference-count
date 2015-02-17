@@ -1,6 +1,6 @@
 {
   "name": "reference-count",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "count references to resources and clean up after sweeps",
   "main": "index.js",
   "scripts": {
