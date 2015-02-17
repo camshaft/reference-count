@@ -23,7 +23,7 @@ inherits(Context, EventEmitter);
 
 Context.prototype.sweep = function(actor) {
   // TODO should we keep track of sweeps so they don't happen concurrently for a single actor
-  return new Sweep(actor, this.actors[actor] || {}, this);
+  return new Sweep(actor, this);
 };
 
 /**
@@ -41,7 +41,7 @@ Context.prototype.destroy = function(actor) {
   }
   delete this.actors[actor];
   return this;
-}
+};
 
 /**
  * Create a sweep instance
@@ -51,11 +51,11 @@ Context.prototype.destroy = function(actor) {
  * @param {Context} context
  */
 
-function Sweep(actor, prev, context) {
+function Sweep(actor, context) {
   this.actor = actor;
   this.context = context;
-  this.resources = {};
-  this.prev = prev;
+  this.prev = context.actors[actor] || {};
+  this.resources = context.actors[actor] = {};
 }
 
 /**
@@ -90,15 +90,14 @@ Sweep.prototype.done = function() {
   for (resource in resources) {
     if (!prev[resource]) {
       counts[resource] |= 0;
-      (counts[resource]++ || context.emit('resource', resource));
+      counts[resource]++ || context.emit('resource', resource);
     }
+    delete prev[resource];
   }
 
   for (resource in prev) {
-    if (!resources[resource]) (--counts[resource] || context.emit('garbage', resource));
+    --counts[resource] || context.emit('garbage', resource);
   }
-
-  context.actors[this.actor] = resources;
 
   delete this.context;
   delete this.prev;
